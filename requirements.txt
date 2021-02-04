@@ -18,3 +18,5 @@ googletrans
 google
 bs4
 pillow
+urllib3
+htmlparser
