@@ -17,14 +17,13 @@ class WABot():
         return answer.json()
 
  
-    def idn(self, chatID):
+    def apa(self, chatID):
         for message in self.dict_messages:
             text = message['body']
-            par = text[10:]
-            translator = Translator()
-            result = translator.translate(par, src='id', dest='en')
+            par = text[8:]
+            req = r.get('https://api.zeks.xyz/api/wiki?apikey=mx7GKG2UZgIiwZ9FI8FzQEXTOpu&q='+par)
             data = {
-               "body": result.text,
+               "body": req.json()['result'],
                "chatId": chatID
             }
             answer = self.send_requests('sendMessage', data)
@@ -76,7 +75,7 @@ class WABot():
 
     def menu(self, chatID):
         data = {
-              "body": '*List Of Command* :\n\n🔖 *tulis* _text_ ( Membuat Tulisan Dibuku )\n🔖 *ig* _url_ ( Unduh Video Instagram )\n🔖 *fb* _url_ ( Unduh Video Facebook )\n🔖 *ig-profil* _username_ ( Melihat Profil Instagram )\n🔖 *arti-nama* _text_ ( Mencari arti nama kamu )\n🔖 *lirik* _judul+artis_ ( Mencari Lirik Lagu )\n🔖  niat-sholat _text_ ( Doa Niat Sholat )',
+              "body": '*List Of Command* :\n\n🔖 *tulis* _text_ ( Membuat Tulisan Dibuku )\n🔖 *ig* _url_ ( Unduh Video Instagram )\n🔖 *fb* _url_ ( Unduh Video Facebook )\n🔖 *ig-profil* _username_ ( Melihat Profil Instagram )\n🔖 *arti-nama* _text_ ( Mencari arti nama kamu )\n🔖 *lirik* _judul+artis_ ( Mencari Lirik Lagu )\n🔖 *tts* _text_ ( text to speech )\n🔖 *yt* url ( Yt To Mp3 )',
               "chatId": chatID
               }
         answer = self.send_requests('sendMessage', data)
@@ -97,7 +96,7 @@ class WABot():
             par = text[4:]
             data = {
                 'chatId': chatID,
-                'body': 'https://api.farzain.com/tts.php?id='+par+'&apikey=JsaChFteVJakyjBa0M5syf64z&',
+                'body': 'https://api.zeks.xyz/api/tts?apikey=mx7GKG2UZgIiwZ9FI8FzQEXTOpu&code=id&text='+par,
                 'filename': 'hahah',
                 'caption': 'example'
             }
@@ -155,6 +154,25 @@ class WABot():
             answer = self.send_requests('sendFile', data)
             return answer  
 
+    def yt(self, chatID):
+        for message in self.dict_messages:
+            text = message['body']
+            tex = message['senderName']
+            import requests as r
+            import json
+            par = text[2:]
+            req= r.get(f'https://api.zeks.xyz/api/ytplaymp4/2?apikey=mx7GKG2UZgIiwZ9FI8FzQEXTOpu&q={par}')
+            js = req.json()['result']
+            data = {
+                  "chatId": chatID,
+                  "body": js['thumb'],
+                  "filename": 'png',
+                  "caption" : f"🔎 *{js['title']}*\n\n*Ukuran* : {js['size']}\n*Durasi* :{js['duration']}\n*Link Download* : {js['link']}"
+                  
+                  
+                  }
+            answer = self.send_requests('sendFile', data)
+            return answer 
 
     def tulis(self, chatID):
         for message in self.dict_messages:
@@ -217,6 +235,12 @@ class WABot():
                         return self.tulis(id)
                     elif text[0].lower() == 'menu':
                         return self.menu(id)
+                    elif text[0].lower() == 'tts':
+                        return self.tts(id)
+                    elif text[0].lower() == 'yt':
+                        return self.yt(id)
+                    elif text[0].lower() == 'apa-itu':
+                        return self.apa(id)
                     else:
                         return self.er(id)
                 else: return 'NoCommand'
