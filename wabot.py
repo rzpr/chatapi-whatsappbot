@@ -6,8 +6,8 @@ class WABot():
     def __init__(self, json):
         self.json = json
         self.dict_messages = json['messages']
-        self.APIUrl = 'https://api.chat-api.com/instance235233/'
-        self.token = 'zna95g6sk5q63vz7'
+        self.APIUrl = 'https://api.chat-api.com/instance294052/'
+        self.token = 'axxoikrq0moarmmj'
         print(self.dict_messages)
    
     def send_requests(self, method, data):
@@ -40,7 +40,32 @@ class WABot():
             answer = self.send_requests('sendMessage', data)
             return answer
 
+    def Nama(self, chatID):
+        for message in self.dict_messages:
+            text = message['body']
+            query = text[10:]
+            import requests as r
+            req = r.get(f'https://lolhuman.herokuapp.com/api/artinama?apikey=e3982397c0f037686dbcaf17&nama={query}')
+            data = {
+            "body": req.json()['result'],
+            "chatId": chatID
+            }
+            answer = self.send_requests('sendMessage', data)
+            return answer
 
+    def niat(self, chatID):
+        for message in self.dict_messages:
+            text = message['body']
+            query = text[11:]
+            import requests as r
+            req = r.get(f'https://lolhuman.herokuapp.com/api/niatsholat/{query}?apikey=e3982397c0f037686dbcaf17'),
+            js = req.json()['result']
+            data = {
+            "body": f"*{js['name']}*\n\n Arab : {js['ar']}\n\n latin : {js['latin']}\n\n id : {js['id']}",
+            "chatId": chatID
+            }
+            answer = self.send_requests('sendMessage', data)
+            return answer
     def start(self, chatID):
         data = {
             "body": "🤖 _Halo Saya Adalah Recsec Bot, Ada Yang Bisa Saya Bantu?_\n\n*Admin :*\n\n📞 : 088299423038\n📱 : _fb.me/rezzapriatna12_ \n\n🚀 *Fitur* \n\n✅ _Youtube Downloader_ \n✅ _Facebook Downloader_ \n✅ _Instagram Downloader_ \n✅ _Google Search_ \n✅ _Text To Speech_ \n✅ _Stalking Profil Instagram_ \n✅ _Translate_ \n\n\n _Untuk Menampilkan Command Ketik_ *Menu*",
@@ -51,7 +76,7 @@ class WABot():
 
     def menu(self, chatID):
         data = {
-              "body": '*List Of Command* :\n\n🔖 *tulis* _text_ ( Membuat Tulisan Dibuku )\n🔖 *ig* _url_ ( Unduh Video Instagram )\n🔖 *fb* _url_ ( Unduh Video Facebook )\n🔖 *ig-profil* _username_ ( Melihat Profil Instagram )\n🔖 *tts* _text_ ( Mengubah Pesan Jadi Suara )\n🔖 *lirik* _judul+artis_ ( Mencari Lirik Lagu )',
+              "body": '*List Of Command* :\n\n🔖 *tulis* _text_ ( Membuat Tulisan Dibuku )\n🔖 *ig* _url_ ( Unduh Video Instagram )\n🔖 *fb* _url_ ( Unduh Video Facebook )\n🔖 *ig-profil* _username_ ( Melihat Profil Instagram )\n🔖 *arti-nama* _text_ ( Mencari arti nama kamu )\n🔖 *lirik* _judul+artis_ ( Mencari Lirik Lagu )\n🔖  niat-sholat _text_ ( Doa Niat Sholat )',
               "chatId": chatID
               }
         answer = self.send_requests('sendMessage', data)
@@ -61,7 +86,7 @@ class WABot():
         p = "Yah Maaf:( Aku Gangerti Apa Yang Kakak Maksud, Kakak Bisa Ketik Start Atau Menu Untuk Menampilkn Apa Saja Yang Aku Bisa:)"
         data = {
               "body": p,
-              "chatId": chatID
+              "phones": chatID
               }
         answer = self.send_requests('sendMessage', data)
         return answer
@@ -99,15 +124,10 @@ class WABot():
         import re
         for message in self.dict_messages:
             text = message['body'] 
-            par = re.search(r'instagram.com\/p\/(.*)\/', text[3:])
-
-            a = r.get(f'https://instagram.com/p/{par.group(1)}'+'?__a=1')
-            b = a.json()
-            c = b['graphql']['shortcode_media']
-            video = (c['video_url']) 
+            req = r.get(f'https://lolhuman.herokuapp.com/api/instagram?apikey=e3982397c0f037686dbcaf17&url={text[3:]}')
             data = {
                 'chatId': chatID,
-                'body': video,
+                'body': req.json()['result'],
                 'filename': 'hahah',
                 'caption': '✅ *Video Berhasil Didownload*'
             }
@@ -122,17 +142,13 @@ class WABot():
             import requests as r
             import json
             par = text[10:]
-            req= r.get('https://www.instagram.com/'+par+'/?__a=1')
-            js1 = req.json()["graphql"]["user"]["biography"]
-            js2 = req.json()["graphql"]["user"]["full_name"]
-            js3 = req.json()["graphql"]["user"]["edge_followed_by"]["count"]
-            js4 = req.json()["graphql"]["user"]["edge_follow"]["count"]
-            js5 = req.json()["graphql"]["user"]["profile_pic_url_hd"]
+            req= r.get(f'https://lolhuman.herokuapp.com/api/stalkig/{par}?apikey=e3982397c0f037686dbcaf17')
+            js = req.json()['result']
             data = {
                   "chatId": chatID,
-                  "body": js5,
+                  "body": js['photo_profile'],
                   "filename": 'png',
-                  "caption" : '🔎 *Hasil Pencarian Instagram* \n\n*Username* : '+par+'\n*Nama* : '+str(js2)+'\n*Bio* : '+str(js1)+'\n*Followers* : '+str(js3)+'\n*Following* :'+str(js4)
+                  "caption" : '🔎 *Hasil Pencarian Instagram* \n\n*Username* : '+par+'\n*Nama* : '+str(js['fullname'])+'\n*Bio* : '+str(js['bio'])+'\n*Followers* : '+str(js['followers'])+'\n*Following* :'+str(js['following'])
                   
                   
                   }
@@ -183,8 +199,8 @@ class WABot():
                 text = message['body'].split()
                 if not message['fromMe']:
                     id  = message['chatId']
-                    if text[0].lower() == 'hi':
-                        return self.welcome(id)
+                    if text[0].lower() == 'niat-sholat':
+                        return self.niat(id)
                     elif text[0].lower() == 'lirik':
                         return self.lirik(id)
                     elif text[0].lower() == 'ig-profil':
@@ -195,8 +211,8 @@ class WABot():
                         return self.start(id)
                     elif text[0].lower() == 'fb':
                         return self.fb(id)
-                    elif text[0].lower() == 'tts':
-                        return self.tts(id)
+                    elif text[0].lower() == 'arti-nama':
+                        return self.Nama(id)
                     elif text[0].lower() == 'tulis':
                         return self.tulis(id)
                     elif text[0].lower() == 'menu':
