@@ -6,8 +6,8 @@ class WABot():
     def __init__(self, json):
         self.json = json
         self.dict_messages = json['messages']
-        self.APIUrl = 'https://api.chat-api.com/instance294052/'
-        self.token = 'axxoikrq0moarmmj'
+        self.APIUrl = 'https://api.chat-api.com/instance296678/'
+        self.token = 'k4w490r4eopcuqro'
         print(self.dict_messages)
    
     def send_requests(self, method, data):
@@ -102,7 +102,23 @@ class WABot():
             }
             answer = self.send_requests('sendFile', data)
             return answer
-    
+
+    def ytb(self, chatID):
+        for message in self.dict_messages:
+            text = message['body'] 
+            par = text[3:]
+            req  = r.get(f'https://lolhuman.herokuapp.com/api/ytsearch?apikey=e3982397c0f037686dbcaf17&query={par}')
+            js = req.json()['result'][1]
+            reqq = r.get(f'https://lolhuman.herokuapp.com/api/ytaudio?apikey=e3982397c0f037686dbcaf17&url=https://www.youtube.com/watch?v={js["videoId"]}')
+            data = {
+                'chatId': chatID,
+                'body': reqq.json()['result']['link'][1]['link'],
+                'filename': 'hahah',
+                'caption': 'example'
+            }
+            answer = self.send_requests('sendFile', data)
+            return answer
+
     def fb(self, chatID):
         for message in self.dict_messages:
             text = message['body'] 
@@ -210,11 +226,11 @@ class WABot():
                     }
                 answer = self.send_requests('sendFile', data)
                 return answer  
-
     def processing(self):
         if self.dict_messages != []:
             for message in self.dict_messages:
                 text = message['body'].split()
+
                 if not message['fromMe']:
                     id  = message['chatId']
                     if text[0].lower() == 'niat-sholat':
@@ -238,7 +254,7 @@ class WABot():
                     elif text[0].lower() == 'tts':
                         return self.tts(id)
                     elif text[0].lower() == 'yt':
-                        return self.yt(id)
+                        return self.ytb(id)
                     elif text[0].lower() == 'apa-itu':
                         return self.apa(id)
                     else:
